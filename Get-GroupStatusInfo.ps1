@@ -24,10 +24,10 @@
 .PARAMETER file
  Output file.
 
-.PARAMETER ExcludeSecGroup
+.PARAMETER ExcludeSecGroupMembers
  Exclude groups that contain other security groups.
 
-.PARAMETER ExcludeComputer
+.PARAMETER ExcludeComputerMembers
  Exclude groups that conatin computer objects.
 
 .EXAMPLE
@@ -44,17 +44,16 @@
 .EXAMPLE
 .\Get-GroupStatusInfo.ps1 -Path "dc=contoso,dc=com" -Server dc1 -File C:\Temp\Groups.csv -maxmembercount 4
 
- List all security groups that only contain users
- This command will search for security groups with the maximum of 4 members, in the path and write the result in the file specified.
+  This command will search for security groups with the maximum of 4 members, in the path and write the result in the file specified.
 
 .EXAMPLE
-.\Get-GroupStatusInfo.ps1 -Path "dc=contoso,dc=com" -Server dc1 -File C:\Temp\Groups.csv  -ExcludeSecGroup
+.\Get-GroupStatusInfo.ps1 -Path "dc=contoso,dc=com" -Server dc1 -File C:\Temp\Groups.csv  -ExcludeSecGroupMembers
 
  List all security groups that only contain users
  This command will search for security groups that does not contain other security groups, in the path and write the result in the file specified.
  
 .EXAMPLE
-.\Get-GroupStatusInfo.ps1 -Path "dc=contoso,dc=com" -Server dc1 -File C:\Temp\Groups.csv  -ExcludeComputer
+.\Get-GroupStatusInfo.ps1 -Path "dc=contoso,dc=com" -Server dc1 -File C:\Temp\Groups.csv  -ExcludeComputerMembers
 
  List all security groups that only contain users
  This command will search for security groups that does not contain computer objects, in the path and write the result in the file specified.
@@ -373,7 +372,7 @@ Begin
                                 $global:bolOnlyDistGrpMember = $false
                             }   
 
-                            if ($ExcludeComputer -eq $true)
+                            if ($ExcludeComputerMembers -eq $true)
                             {
                                 if ($sttObjectClass -eq "computer")
                                 {
@@ -385,7 +384,7 @@ Begin
 
                                 }
                             }
-                            if ($ExcludeSecGroup -eq $true)
+                            if ($ExcludeSecGroupMembers -eq $true)
                             {
                                 if ($sttObjectClass -eq "group")
                                 {
@@ -515,7 +514,7 @@ Process
                 if ($DistributionGroups)
                 {
                     $strFilter = "(&(objectCategory=Group)(name=" + $NameFilter + ")(|(groupType=2)(groupType=4)(groupType=8)))"
-                }
+                } 
                 else
                 {
                     $strFilter = "(&(objectCategory=Group)(name=" + $NameFilter + ")(|(groupType=-2147483640)(groupType=-2147483644)(groupType=-2147483646)))"
@@ -527,7 +526,7 @@ Process
                 if ($DistributionGroups)
                 {
                     $strFilter = "(&(objectCategory=Group)(|(groupType=2)(groupType=4)(groupType=8)))"
-                }
+                } 
                 else
                 {
                     $strFilter = "(&(objectCategory=Group)(|(groupType=-2147483640)(groupType=-2147483644)(groupType=-2147483646)))"
@@ -770,7 +769,7 @@ Process
                             {
                                 if ($members -gt 0)
                                 {
-                                    foreach ($user in @($objResult.Attributes.member[0]))
+                                    foreach ($user in @($objResult.Attributes.member[0..$members]))
                                     {
 
                                         $objMember = New-Object System.DirectoryServices.DirectoryEntry("LDAP://$($user)")
@@ -793,7 +792,7 @@ Process
 
                                             }            
             
-                                            if ($ExcludeComputer -eq $true)
+                                            if ($ExcludeComputerMembers -eq $true)
                                             {
                                                 if ($sttObjectClass -eq "computer")
                                                 {
@@ -805,7 +804,7 @@ Process
 
                                                 }
                                             }
-                                            if ($ExcludeSecGroup -eq $true)
+                                            if ($ExcludeSecGroupMembers -eq $true)
                                             {
                                                 if ($sttObjectClass -eq "group")
                                                 {
