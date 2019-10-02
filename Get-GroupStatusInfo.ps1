@@ -63,10 +63,10 @@
     The output is an CSV,HTML or EXCEL report.
 
 .LINK
-    https://github.com/canix1
+    https://github.com/canix1/Get-GroupStatusInfo
 
 .NOTES
-    Version: 0.12
+    Version: 0.13
    
 #>
 
@@ -508,31 +508,32 @@ Process
                 $Server = $strDC
             }
 
+            $strFilter = "(&(objectCategory=Group)"
             if ($NameFilter)
             {
+   
+                $strFilter = $strFilter + "(name=" + $NameFilter + ")"
 
-                if ($DistributionGroups)
-                {
-                    $strFilter = "(&(objectCategory=Group)(name=" + $NameFilter + ")(|(groupType=2)(groupType=4)(groupType=8)))"
-                } 
-                else
-                {
-                    $strFilter = "(&(objectCategory=Group)(name=" + $NameFilter + ")(|(groupType=-2147483640)(groupType=-2147483644)(groupType=-2147483646)))"
-                }
             }
+
+            if($maxmembercount -eq 0)
+            {
+                
+                $strFilter = $strFilter + "(!(member=*))"
+
+            }
+
+
+            if ($DistributionGroups)
+            {
+                $strFilter = $strFilter + "(|(groupType=2)(groupType=4)(groupType=8))"
+            } 
             else
             {
-
-                if ($DistributionGroups)
-                {
-                    $strFilter = "(&(objectCategory=Group)(|(groupType=2)(groupType=4)(groupType=8)))"
-                } 
-                else
-                {
-                    $strFilter = "(&(objectCategory=Group)(|(groupType=-2147483640)(groupType=-2147483644)(groupType=-2147483646)))"
-                }
+                $strFilter = $strFilter + "(|(groupType=-2147483640)(groupType=-2147483644)(groupType=-2147483646))"
             }
-
+            
+            $strFilter = $strFilter + ")"
     
 
             $i = 0
